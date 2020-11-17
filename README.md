@@ -1,2 +1,1 @@
-# globomap-m2vm
-Globomap Metal to VM
+# Globomap Metal to VM
