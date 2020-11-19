@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template
+from m2vm.forms import MetalForm
 
 
 def create_app(config_module=None):
@@ -10,9 +11,10 @@ def create_app(config_module=None):
                            'm2vm.config')
 
 
-    @app.route('/', methods=['GET'])
+    @app.route('/', methods=['GET', 'POST'])
     def index():
-        return render_template('search.html')
+        form = MetalForm()
+        return render_template('search.html', form=form)
 
 
     @app.route('/dummy-gmap-api/<string:m>', methods=['GET'])

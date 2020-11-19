@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1> Lisitar VMs a partir de uma maquina fisica </h1>
+<h1> Listar VMs a partir de uma maquina fisica </h1>
 <form action="" method="post" novalidate>
 
   {{ form.hidden_tag() }}
 
   <p>
-    {{ form.username.label }} <br>
-    {{ form.username(size=32) }}
+    {{ form.metal_name.label }} <br>
+    {{ form.metal_name(size=32) }}
   </p>
 
   <p>
     {{form.submit()}}
   </p>
-
 </form>
 {% endblock %}
