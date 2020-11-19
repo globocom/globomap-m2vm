@@ -1,6 +1,6 @@
 import os
-from flask import Flask, render_template, request
-
+from flask import Flask, request, render_template, redirect
+import requests
 
 def create_app(config_module=None):
     app = Flask(__name__)
@@ -12,12 +12,18 @@ def create_app(config_module=None):
 
     @app.route('/', methods=['GET', 'POST'])
     def index():
-        return render_template('search.html')
+        machine = request.form.get('machine')
+        context = {}
+        if machine:
+            print (machine)
+            r = requests.get('http://localhost:8888/dummy-gmap-api/' + machine)
+            context[machine] = r.json().get('machine')
 
+        return render_template('search.html', info=context)
 
     @app.route('/dummy-gmap-api/<string:m>', methods=['GET'])
     def dummy_gmap_api(m):
-        return { 'maquina': m }
+        return { 'machine': {'vm1': 'vm' + m} }
 
 
     return app

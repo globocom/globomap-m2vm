@@ -4,9 +4,18 @@
 <h1> Listar VMs a partir de uma maquina fisica </h1>
 <form action="" method="post" novalidate>
   <p>
-    <label for="maquina">Maquina fisica</label> <br>
-    <input type="text" name="maquina"> <br>
-    <input type="submit" name="Procurar">
+    <label for="machine">Maquina fisica</label> <br>
+    <input type="text" name="machine"> <br>
+    <input type="submit" name="search">
   </p>
 </form>
+{% if info %}
+
+<p>
+  {{info}}
+</p>
+
+{%endif %}
+
+
 {% endblock %}
