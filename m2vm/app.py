@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 
 
 def create_app(config_module=None):
@@ -8,4 +8,16 @@ def create_app(config_module=None):
     app.config.from_object(config_module or
                            os.getenv('APP_CONFIG') or
                            'm2vm.config')
+
+
+    @app.route('/', methods=['GET'])
+    def index():
+        return render_template('search.html')
+
+
+    @app.route('/dummy-gmap-api/<string:m>', methods=['GET'])
+    def dummy_gmap_api(m):
+        return { 'real': m }
+
+
     return app
