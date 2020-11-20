@@ -1,29 +1,44 @@
 import os
-from flask import Flask, request, render_template, redirect
 import requests
+from flask import Flask, request, render_template
+
 
 def create_app(config_module=None):
     app = Flask(__name__)
-    app.secret_key = os.getenv('APP_SECRET_KEY', '4pp53cr37k31')
-    app.config.from_object(config_module or
-                           os.getenv('APP_CONFIG') or
-                           'm2vm.config')
+
+    if config_module:
+        app.config.from_pyfile(config_module)
+    else:
+        app.config.from_pyfile('config/dev_config.py')
 
 
-    @app.route('/', methods=['GET', 'POST'])
-    def index():
+    @app.route('/', methods=['GET'])
+    def home():
+        return render_template('search.html')
+
+
+    @app.route('/', methods=['POST'])
+    def vm_list():
+        from flask import current_app as app
+        gmap_api_url = app.config.get('GLOBOMAP_API_URL')
+
         machine = request.form.get('machine')
-        context = {}
-        if machine:
-            print (machine)
-            r = requests.get('http://localhost:8888/dummy-gmap-api/' + machine)
-            context[machine] = r.json().get('machine')
+        if not machine:
+            return 'Missing parameter: machine', 400
 
-        return render_template('search.html', info=context)
+        req = requests.get(f'{gmap_api_url}/{machine}')
+        context = req.json()
 
-    @app.route('/dummy-gmap-api/<string:m>', methods=['GET'])
-    def dummy_gmap_api(m):
-        return { 'machine': {'vm1': 'vm' + m} }
+        return render_template('search.html', **context)
+
+
+    @app.route('/dummy-gmap-api/<string:machine>', methods=['GET'])
+    def dummy_gmap_api(machine):
+        return {
+            'machine': machine,
+            'vms': [{'name': f'{machine}_vm_{n:02}',
+                     'ip': f'10.0.0.{n}'} for n in range(1, 11)]
+        }
 
 
     return app
