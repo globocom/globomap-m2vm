@@ -8,6 +8,7 @@ help:
 clean:  ## Clear *.pyc and unnecessary files
 	@find . -name "*.pyc" -delete
 	@find . -name "*.~" -delete
+	@find . -name "__pycache__" -delete
 
 coverage:  ## Code coverage report
 	@coverage report -m --rcfile=.coveragerc

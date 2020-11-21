@@ -11,11 +11,9 @@ def create_app(config_module=None):
     else:
         app.config.from_pyfile('config/dev_config.py')
 
-
     @app.route('/', methods=['GET'])
     def home():
         return render_template('search.html')
-
 
     @app.route('/', methods=['POST'])
     def vm_list():
@@ -31,7 +29,6 @@ def create_app(config_module=None):
 
         return render_template('search.html', **context)
 
-
     @app.route('/dummy-gmap-api/<string:machine>', methods=['GET'])
     def dummy_gmap_api(machine):
         return {
@@ -39,6 +36,5 @@ def create_app(config_module=None):
             'vms': [{'name': f'{machine}_vm_{n:02}',
                      'ip': f'10.0.0.{n}'} for n in range(1, 11)]
         }
-
 
     return app
