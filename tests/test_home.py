@@ -28,4 +28,3 @@ class NullInputTest (BaseTest):
     def test_null_input_returns_status_code_400(self):
         response = self.client.post('/')
         self.assertEqual(response.status_code, 400)
-
