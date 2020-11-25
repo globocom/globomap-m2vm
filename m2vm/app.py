@@ -24,9 +24,6 @@ def create_app(config_module=None):
         if not machine:
             return 'Missing parameter: machine', 400
 
-        if len(machine) > 100:
-            return 'Input is too long (max of 100 chars)', 400
-
         req = requests.get(f'{gmap_api_url}/{machine}')
         context = req.json()
 
