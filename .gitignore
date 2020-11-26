@@ -131,8 +131,6 @@ dmypy.json
 # VSCode settings
 .vscode/
 
-# /bin
 m2vm/bin/*
-
-#
 m2vm/pyvenv.cfg
+TODO
