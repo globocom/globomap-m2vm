@@ -13,16 +13,14 @@
 </form>
 <br>
 
-{% if vms %}
+{% if phys %}
 <table class="ss-table">
   <tr>
     <th>Name</th>
-    <th>Ip</th>
   </tr>
-  {% for vm in vms %}
+  {% for phy in phys %}
   <tr>
-    <td>{{ vm.name }}</td>
-    <td>{{ vm.ip }}</td>
+    <td>{{ phy.name }}</td>
   </tr>
   {% endfor %}
 </table>

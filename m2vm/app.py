@@ -36,7 +36,7 @@ class GmapClient:
         return req.json()
 
 
-class VirtualMachineBase:
+class PhysicalMachine:
     def __init__(self, name=None, id=None):
         self.name = name
         self.id = name
@@ -67,13 +67,13 @@ def create_app(config_module=None):
         gmap_client = GmapClient()
         data = gmap_client.find_nodes(machine)
 
-        vms = []
+        phys = []
         #num_documents in a page
         num_documents = data['total']
         for document in range(num_documents):
-            vms.append(VirtualMachineBase(data['documents'][document]['name'], data['documents'][document]['_id']))
+            phys.append(PhysicalMachine(data['documents'][document]['name'], data['documents'][document]['_id']))
 
-        context = {'vms': vms}
+        context = {'phys': phys}
 
         return render_template('search.html', **context)
 
