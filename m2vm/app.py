@@ -29,7 +29,7 @@ class GmapClient:
     def find_nodes(self, q_var):
         req = requests.get(f'{self.gmap_api_url}/collections/search/',
                            params={
-                               'query': f'[[{{"field":"name","operator":"LIKE","value":"{q_var}"}}]]' ,
+                               'query': f'''[[{{"field":"name","operator":"LIKE","value":"{q_var}"}}, {{"field":"properties.equipment_type", "operator":"==", "value":"Servidor"}}]]''' ,
                                'collections': ['comp_unit']
                            },
                            headers={'Authorization': self.token_data.get('token')})
@@ -40,6 +40,7 @@ class PhysicalMachine:
     def __init__(self, name=None, id=None):
         self.name = name
         self.id = name
+        self.graph = None
 
 
 def create_app(config_module=None):
