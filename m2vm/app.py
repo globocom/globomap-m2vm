@@ -36,6 +36,12 @@ class GmapClient:
         return req.json()
 
 
+class VirtualMachineBase:
+    def __init__(self, name=None, id=None):
+        self.name = name
+        self.id = name
+
+
 def create_app(config_module=None):
     app = Flask(__name__, static_url_path='/static')
 
@@ -61,7 +67,13 @@ def create_app(config_module=None):
         gmap_client = GmapClient()
         data = gmap_client.find_nodes(machine)
 
-        context = {}
+        vms = []
+        #num_documents in a page
+        num_documents = data['total']
+        for document in range(num_documents):
+            vms.append(VirtualMachineBase(data['documents'][document]['name'], data['documents'][document]['_id']))
+
+        context = {'vms': vms}
 
         return render_template('search.html', **context)
 
