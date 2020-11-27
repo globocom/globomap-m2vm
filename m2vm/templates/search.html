@@ -3,19 +3,20 @@
 {% block content %}
 
 <span>globomap</span>
-<h1>Lista de VMs a partir de uma máquina física</h1>
+<h2>Lista de VMs a partir de uma máquina física</h2>
 <form action="" method="post" novalidate>
-  <p>
-    <label for="machine">Maquina fisica</label> <br>
-    <input type="text" name="machine" value="{% if machine %}{{ machine }}{% endif %}"> <br>
+  <div class="ss-form-row">
+    <label class="ss-label" for="machine">Maquina física</label>
+    <input class="ss-input-text" type="text" name="machine"
+           value="{% if machine %}{{ machine }}{% endif %}"> <br>
     <br>
-    <input type="submit" value="Enviar">
-  </p>
+    <button class="ss-btn" type="submit">Enviar</button>
+  </div>
 </form>
 <br>
 
 {% if vms %}
-<table>
+<table class="ss-table">
   <tr>
     <th>Name</th>
     <th>Ip</th>

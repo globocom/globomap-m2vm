@@ -1,0 +1,13 @@
+@import 'base.css';
+@import 'forms.css';
+@import 'buttons.css';
+
+body {
+  box-sizing: border-box;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: #333;
+  font-family: var(--font-normal);
+  background-color: var(--bg-color);
+}

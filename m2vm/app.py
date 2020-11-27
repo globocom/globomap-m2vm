@@ -37,7 +37,7 @@ class GmapClient:
 
 
 def create_app(config_module=None):
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='/static')
 
     if config_module:
         app.config.from_pyfile(config_module)

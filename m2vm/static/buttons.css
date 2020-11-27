@@ -1,0 +1,78 @@
+a.ss-btn {
+  color: white;
+}
+
+a.ss-btn:hover {
+  text-decoration: none;
+}
+
+button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.ss-btn {
+  background-color: var(--main-color);
+  color: white;
+}
+
+.ss-btn,
+.ss-btn-light {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  outline: none;
+  height: 38px;
+  white-space: nowrap;
+}
+
+.ss-btn:hover,
+.ss-btn-light:hover {
+  opacity: 0.80;
+  cursor: pointer;
+}
+
+.ss-btn-light {
+  background-color: #f8f8f8;
+  border-width: 1px;
+  border-color: var(--line-context-color);
+  color: var(--main-color);
+}
+
+.ss-btn.ss-danger {
+  background-color: var(--color-danger);
+}
+
+.ss-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.ss-btn.ss-btn-icon .ss-icon,
+.ss-btn-light.ss-btn-icon .ss-icon {
+  margin-right: 0;
+}
+
+.ss-link {
+  display: flex;
+  align-items: center;
+  margin-right: 5px;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--main-color);
+  background: none;
+  border: none;
+}
+
+.ss-link .ss-icon {
+  margin: 0 5px 0 0;
+}
+
+.ss-link:hover {
+  cursor: pointer;
+  opacity: 0.75;
+}
