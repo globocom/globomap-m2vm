@@ -35,12 +35,21 @@ class GmapClient:
                            headers={'Authorization': self.token_data.get('token')})
         return req.json()
 
+    def find_vms(self, phys):
+        req = requests.get(f'{self.gmap_api_url}/graphs/{phys.graph}/traversal/',
+                            params={
+                                'graph' : phys.graph,
+                                'start_vertex' : 'comp_unit/globomap_cmaq24mp01lc13',#phys.id,
+                                'max_depth' : '4'
+                            },
+                           headers={'Authorization': self.token_data.get('token')})
+        return req.json()
 
 class PhysicalMachine:
     def __init__(self, name=None, id=None):
         self.name = name
         self.id = name
-        self.graph = None
+        self.graph = 'physical_host'
 
 
 def create_app(config_module=None):
@@ -74,6 +83,9 @@ def create_app(config_module=None):
         for document in range(num_documents):
             phys.append(PhysicalMachine(data['documents'][document]['name'], data['documents'][document]['_id']))
 
+        vms = gmap_client.find_vms(phys[0])
+
+        import ipdb; ipdb.set_trace()
         context = {'phys': phys}
 
         return render_template('search.html', **context)
