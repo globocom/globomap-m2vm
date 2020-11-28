@@ -7,23 +7,48 @@
 <form action="" method="post" novalidate>
   <div class="ss-form-row">
     <label class="ss-label" for="machine">Maquina física</label>
-    <input class="ss-input-text" type="text" name="machine" value="{% if machine %}{{ machine }}{% endif %}">
+    <input class="ss-input-text" type="text" name="server_name" value="{% if server_name %}{{ server_name }}{% endif %}">
     <button class="ss-btn" type="submit">Procurar</button>
   </div>
 </form>
 <br>
 
-{% if phys %}
+{% if server_list %}
 <table class="ss-table">
   <tr>
-    <th>Name</th>
+    <th>Nome</th>
+    <th>IPs</th>
   </tr>
-  {% for phy in phys %}
+  {% for server in server_list %}
   <tr>
-    <td>{{ phy.name }}</td>
+    <td>
+      <a href="#" onclick="return get_vms('{{server.name}}', '{{server._id}}')">{{ server.name }}</a>
+    </td>
+    <td>
+      {{ server.ips|join(', ') }}
+    </td>
   </tr>
   {% endfor %}
 </table>
 {% endif %}
 
+{% endblock %}
+
+{% block js %}
+<script>
+function get_vms(name, id) {
+  fetch(`/${name}`, {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ server_id: id })
+  })
+  .then(res => res.json())
+  .then(json => {
+    console.log(json);
+  })
+  .catch(err => console.log(err));
+
+  return false;
+}
+</script>
 {% endblock %}
