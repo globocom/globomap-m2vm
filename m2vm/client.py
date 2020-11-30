@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 import requests
 from flask import current_app, session
 
@@ -15,12 +16,11 @@ class GmapClient:
         self.auth()
 
     def auth(self):
-        if self.token_data:
-            return
-
         if session.get('token_data'):
-            self.token_data = session['token_data']
-            return
+            expires = datetime.strptime(session['token_data']['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+            if expires > datetime.now():
+                self.token_data = session['token_data']
+                return
 
         try:
             token_data = requests.post(f'{self.gmap_api_url}/auth/', json={
