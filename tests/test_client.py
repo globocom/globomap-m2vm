@@ -6,4 +6,3 @@ class ClientTest(TestCase):
 
     def setUp(self):
         self.gmap_client = GmapClient()
-

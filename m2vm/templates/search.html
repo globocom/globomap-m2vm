@@ -3,8 +3,8 @@
 {% block content %}
 
 <span>globomap</span>
-<h2>Lista de VMs a partir de uma máquina física</h2>
-<form action="" method="post" novalidate>
+<h2>Lista de VMs em uma máquina física</h2>
+<form action="{{ url_for('server_list') }}" method="post">
   <div class="ss-form-row">
     <label class="ss-label" for="machine">Maquina física</label>
     <input class="ss-input-text" type="text" name="server_name" value="{% if server_name %}{{ server_name }}{% endif %}">
@@ -13,42 +13,44 @@
 </form>
 <br>
 
-{% if server_list %}
-<table class="ss-table">
-  <tr>
-    <th>Nome</th>
-    <th>IPs</th>
-  </tr>
-  {% for server in server_list %}
-  <tr>
-    <td>
-      <a href="#" onclick="return get_vms('{{server.name}}', '{{server._id}}')">{{ server.name }}</a>
-    </td>
-    <td>
-      {{ server.ips|join(', ') }}
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+{% if step == 1 %}
+  {% if server_list %}
+  <p>Máquinas com nome semalhante a "<strong>{{ server_name }}</strong>":</p>
+  <table class="ss-table server-list">
+    <tr>
+      <th>Nome</th>
+      <th>IPs</th>
+    </tr>
+    {% for server in server_list %}
+    <tr>
+      <td><a href="{{ server.vm_list_url }}">{{ server.name }}</a></td>
+      <td>{{ server.ips|join(', ') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>Nenhuma Máquina encontrada para o termo <strong>{{ server_name }}</strong></p>
+  {% endif %}
 {% endif %}
 
-{% endblock %}
+{% if step == 2 %}
+  {% if vm_list %}
+  <p>VMs em <strong>{{ server_name }}</strong>:</p>
+  <table class="ss-table vm-list">
+    <tr>
+      <th>Name</th>
+      <th>IPs</th>
+    </tr>
+    {% for vm in vm_list %}
+    <tr>
+      <td>{{ vm.name }}</td>
+      <td>{{ vm.ips|join(', ') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>Nenhuma VM encontrada em <strong>{{ server_name }}</strong></p>
+  {% endif %}
+{% endif %}
 
-{% block js %}
-<script>
-function get_vms(name, id) {
-  fetch(`/${name}`, {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ server_id: id })
-  })
-  .then(res => res.json())
-  .then(json => {
-    console.log(json);
-  })
-  .catch(err => console.log(err));
-
-  return false;
-}
-</script>
 {% endblock %}

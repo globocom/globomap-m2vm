@@ -1,6 +1,6 @@
 import logging
-from datetime import datetime
 import requests
+from datetime import datetime
 from flask import current_app, session
 
 log = logging.getLogger(__name__)
@@ -21,7 +21,6 @@ class GmapClient:
             if expires > datetime.now():
                 self.token_data = session['token_data']
                 return
-
         try:
             token_data = requests.post(f'{self.gmap_api_url}/auth/', json={
                 'username': self.username,
@@ -32,11 +31,9 @@ class GmapClient:
         except Exception as err:
             log.exception(f'Globomap API auth error: {err}')
 
-    def find_nodes(self, server_name):
-        req = requests.get(f'{self.gmap_api_url}/collections/search/',
-                           params={'query': f'[[{{"field":"name","operator":"LIKE","value":"{server_name}"}}], \
-                                               [{{"field":"properties.equipment_type", "operator":"==", "value":"Servidor"}}]]',
-                                   'collections': ['comp_unit']},
+    def run_query(self, query_name, variable):
+        req = requests.get(f'{self.gmap_api_url}/queries/{query_name}/execute',
+                           params={'variable': variable},
                            headers={'Authorization': self.token_data.get('token')})
         return req.json()
 

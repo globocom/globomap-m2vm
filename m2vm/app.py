@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for, redirect
 from .client import GmapClient
 
 log = logging.getLogger(__name__)
@@ -29,29 +29,51 @@ def create_app(config_module=None):
         if len(server_name) > 100:
             return 'Input is too long (max of 100 chars)', 400
 
-        context = {'server_name': server_name, 'server_list': []}
-        data = GmapClient().find_nodes(server_name)
+        data = GmapClient().run_query('query_physical_servers', server_name)
+        context = {
+            'server_name': server_name,
+            'server_list': [],
+            'step': 1
+        }
 
-        if len(data['documents']):
-            for item in data['documents']:
+        if len(data):
+            for item in data:
+                vm_list_url = f"{url_for('vm_list', server_name=item['name'])}?server_id={item['_id']}"
                 context['server_list'].append({
                     '_id': item['_id'],
                     'name': item['name'],
-                    'ips': item['properties'].get('ips', '')
+                    'ips': item['properties'].get('ips', ''),
+                    'vm_list_url': vm_list_url
                 })
+
+        if len(context['server_list']) == 1:
+            return redirect(context['server_list'][0]['vm_list_url'])
 
         return render_template('search.html', **context)
 
-    @app.route('/<string:server_name>', methods=['POST'])
+    @app.route('/<string:server_name>', methods=['GET'])
     def vm_list(server_name):
-        server_id = request.json.get('server_id')
+        server_id = request.args.get('server_id')
+
+        if not server_id:
+            return 'Missing parameter: server_id', 400
+
         data = GmapClient().find_vms(server_id)
+        context = {
+            'server_name': server_name,
+            'vm_list': [],
+            'step': 2
+        }
 
-        vm_list = []
-        for item in data['nodes']:
-            if item['properties'].get('equipment_type') == 'Servidor Virtual':
-                vm_list.append(item)
+        if len(data.get('nodes', [])):
+            for item in data['nodes']:
+                if item['properties'].get('equipment_type') == 'Servidor Virtual':
+                    context['vm_list'].append({
+                        '_id': item['_id'],
+                        'name': item['name'],
+                        'ips': item['properties'].get('ips', '')
+                    })
 
-        return {'vm_list': vm_list}
+        return render_template('search.html', **context)
 
     return app
