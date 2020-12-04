@@ -35,7 +35,7 @@ class GmapClient:
         req = requests.get(f'{self.gmap_api_url}/queries/{query_name}/execute',
                            params={'variable': variable},
                            headers={'Authorization': self.token_data.get('token')})
-        return req.json()
+        return req.status_code, req.json()
 
     def find_vms(self, physical_id):
         req = requests.get(f'{self.gmap_api_url}/graphs/physical_host/traversal/',
@@ -45,4 +45,4 @@ class GmapClient:
                                    'direction': 'any',
                                    'collections': ['comp_unit']},
                            headers={'Authorization': self.token_data.get('token')})
-        return req.json()
+        return req.status_code, req.json()

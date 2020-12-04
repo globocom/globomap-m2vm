@@ -29,7 +29,11 @@ def create_app(config_module=None):
         if len(server_name) > 100:
             return 'Input is too long (max of 100 chars)', 400
 
-        data = GmapClient().run_query('query_physical_servers', server_name)
+        status, data = GmapClient().run_query('query_physical_servers', server_name)
+
+        if status > 399:
+            return data, status
+
         context = {
             'server_name': server_name,
             'server_list': [],
@@ -58,7 +62,11 @@ def create_app(config_module=None):
         if not server_id:
             return 'Missing parameter: server_id', 400
 
-        data = GmapClient().find_vms(server_id)
+        status, data = GmapClient().find_vms(server_id)
+
+        if status > 399:
+            return data, status
+
         context = {
             'server_name': server_name,
             'vm_list': [],
