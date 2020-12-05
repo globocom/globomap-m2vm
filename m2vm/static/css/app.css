@@ -72,10 +72,10 @@ h3 {
   padding: 12px;
   border-bottom: 1px solid #ddd;
 
-  max-width: 0;
+  /* max-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: nowrap; */
 }
 
 .ss-table th {
