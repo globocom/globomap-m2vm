@@ -39,9 +39,9 @@ class GmapClient:
 
     def find_vms(self, physical_id):
         req = requests.get(f'{self.gmap_api_url}/graphs/physical_host/traversal/',
-                           params={'graph' : 'physical_host',
-                                   'start_vertex' : physical_id,
-                                   'max_depth' : '1',
+                           params={'graph': 'physical_host',
+                                   'start_vertex': physical_id,
+                                   'max_depth': '1',
                                    'direction': 'any',
                                    'collections': ['comp_unit']},
                            headers={'Authorization': self.token_data.get('token')})
