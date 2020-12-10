@@ -72,12 +72,14 @@ class AppTest(TestCase):
 
     #new
     @mock.patch('m2vm.client.GmapClient.run_query')
-    def test_return_redirect_if_only_one_server_is_found(self, mock_query):
+    @mock.patch('m2vm.client.GmapClient.find_vms')
+    def test_return_redirect_if_only_one_server_is_found(self, mock_vms, mock_query):
         mock_query.return_value = [{
             '_id': '0as9d0',
             'name': 'machine',
             'properties' : {'ips' : ('10.0.0.1', '10.0.0.2')},
             }]
+        mock_vms.return_value = {'nodes': []}
 
         with self.client as c:
             response = c.post('/', data={"server_name": "machine"}, follow_redirects=True)

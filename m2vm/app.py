@@ -54,7 +54,6 @@ def create_app(config_module=None):
     @app.route('/<string:server_name>', methods=['GET'])
     def vm_list(server_name):
         server_id = request.args.get('server_id')
-
         if not server_id:
             return 'Missing parameter: server_id', 400
 
