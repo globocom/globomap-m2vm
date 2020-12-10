@@ -4,17 +4,10 @@ from flask import session
 from requests.exceptions import HTTPError
 from m2vm.app import create_app
 from m2vm.client import GmapClient
-
-
-class FakeAuthResponse:
-
-    def __init__(self, token=None, expires_at=None):
-        self.token = token or 'tokentest'
-        one_hour = (datetime.now() + timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        self.expires_at = expires_at or one_hour
-
-    def json(self):
-        return {'token': self.token, 'expires_at': self.expires_at}
+from m2vm.app import create_app
+from datetime import datetime, timedelta
+from flask import session, current_app
+import requests
 
 
 class ClientTest(TestCase):
@@ -22,56 +15,66 @@ class ClientTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.app = create_app('config/test_config.py')
-        cls.client = cls.app.test_client()
-
-        post_mock = mock.patch('requests.post').start()
-        post_mock.return_value = FakeAuthResponse()
-
-    @classmethod
-    def tearDownClass(cls):
-        mock.patch.stopall()
-
-    def test_authenticated_gmapclient_instance(self):
-        with self.app.test_request_context():
-            gmap_client = GmapClient()
-            token = gmap_client.token_data.get('token')
-            self.assertEqual(token, 'tokentest')
-
-    def test_session_with_saved_token_data(self):
-        with self.app.test_request_context():
-            self.assertNotIn('token_data', session)
-            GmapClient()
-            self.assertIn('token_data', session)
-
-    def test_client_renew_expired_token(self):
-        expired = (datetime.now() + timedelta(hours=-1)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        with self.app.test_request_context():
-            session['token_data'] = {'token': 'expiredtoken', 'expires_at': expired}
-            gmap_client = GmapClient()
-            token = gmap_client.token_data.get('token')
-            self.assertEqual(token, 'tokentest')
 
     @mock.patch('requests.post')
-    def test_globomap_api_auth_exception(self, post_mock):
-        post_mock.side_effect = HTTPError()
+    def test_getting_new_token_with_no_prior_token(self, mock_post):
+        mock_post.return_value.json.return_value = {
+            'data' : 'teste'
+        }
+        with self.app.test_request_context():
+            session['token_data'] = None
+
+            gmap_client = GmapClient()
+
+            self.assertEqual(session['token_data'], mock_post.return_value.json.return_value)
+
+    def test_reusing_non_expired_token(self):
+        with self.app.test_request_context():
+            session['token_data'] = {'expires_at' : (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'), 'token_value' : 'AS%S715H#JB213S%JCN'}
+            gmap_client = GmapClient()
+
+            self.assertEqual(gmap_client.token_data, session['token_data'])
+
+    @mock.patch('requests.post')
+    def test_getting_new_token_with_expired_token(self, mock_post):
+        mock_post.return_value.json.return_value = {
+            'data' : 'teste'
+        }
+        with self.app.test_request_context():
+            session['token_data'] = {'expires_at' : (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'), 'token_value' : 'AS%S715H#JB213S%JCN'}
+            gmap_client = GmapClient()
+
+            self.assertEqual(session['token_data'], mock_post.return_value.json.return_value)
+
+    @mock.patch('requests.post')
+    def test_auth_throws_exception (self, mock_post):
+        mock_post.side_effect = requests.exceptions.ConnectionError()
         with self.app.test_request_context():
             gmap_client = GmapClient()
             self.assertEqual(gmap_client.token_data, None)
 
     @mock.patch('requests.get')
-    def test_run_query_return(self, get_mock):
-        get_mock.return_value.status_code = 200
-        get_mock.return_value.json.return_value = {}
-
+    def test_run_query(self, mock_get):
+        mock_get.return_value.json.return_value = {
+            'data' : 'teste'
+        }
         with self.app.test_request_context():
-            query = GmapClient().run_query('q_name', 'var')
-            self.assertEqual(query, (200, {}))
+            session['token_data'] = {'expires_at' : (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'), 'token_value' : 'AS%S715H#JB213S%JCN'}
+            gmap_client = GmapClient()
+
+            status, query_result = gmap_client.run_query('query', 'variable')
+
+            self.assertEqual(query_result, mock_get.return_value.json.return_value)
 
     @mock.patch('requests.get')
-    def test_find_vms_return(self, get_mock):
-        get_mock.return_value.status_code = 200
-        get_mock.return_value.json.return_value = {}
-
+    def test_find_vms(self, mock_get):
+        mock_get.return_value.json.return_value = {
+            'data' : 'teste'
+        }
         with self.app.test_request_context():
-            query = GmapClient().find_vms('id')
-            self.assertEqual(query, (200, {}))
+            session['token_data'] = {'expires_at' : (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'), 'token_value' : 'AS%S715H#JB213S%JCN'}
+            gmap_client = GmapClient()
+
+            status, query_result = gmap_client.find_vms('id')
+
+            self.assertEqual(query_result, mock_get.return_value.json.return_value)

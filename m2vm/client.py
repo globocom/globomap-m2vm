@@ -28,8 +28,11 @@ class GmapClient:
             }).json()
             session['token_data'] = token_data
             self.token_data = token_data
+
         except Exception as err:
+            self.token_data = None
             log.exception(f'Globomap API auth error: {err}')
+
 
     def run_query(self, query_name, variable):
         req = requests.get(f'{self.gmap_api_url}/queries/{query_name}/execute',
