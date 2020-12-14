@@ -9,4 +9,3 @@ GLOBOMAP_API_URL = os.getenv('GLOBOMAP_API_URL',
                              'http://localhost:8888/dummy-gmap-api')
 GLOBOMAP_API_USERNAME = os.getenv('GLOBOMAP_API_USERNAME', 'username')
 GLOBOMAP_API_PASSWORD = os.getenv('GLOBOMAP_API_PASSWORD', 'password')
-

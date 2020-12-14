@@ -12,6 +12,7 @@
   --font-light: "opensans-light", Helvetica, sans-serif;
 }
 
+
 body {
   box-sizing: border-box;
   border: 0;
@@ -71,11 +72,6 @@ h3 {
   margin: 0;
   padding: 12px;
   border-bottom: 1px solid #ddd;
-
-  /* max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap; */
 }
 
 .ss-table th {
