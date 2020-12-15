@@ -21,21 +21,29 @@ def create_app(config_module=None):
 
     @app.route('/', methods=['POST'])
     def server_list():
-        server_name = request.form.get('server_name')
+        search_type = request.form.get('search_type')
+        server_q = request.form.get('server_q')
 
-        if not server_name:
-            return 'Missing parameter: server_name', 400
+        if not server_q:
+            return 'Missing parameter: name or ip', 400
 
-        if len(server_name) > 100:
-            return 'Input is too long (max of 100 chars)', 400
+        if search_type == 'by_name' and len(server_q) > 100:
+            return 'Name is too long (max of 100 chars)', 400
 
-        status, data = GmapClient().run_query('query_physical_servers', server_name)
+        if search_type == 'server_ip' and len(server_q) < 8:
+            return f'IP {server_q} is too short', 400
+
+        if search_type == 'by_name':
+            status, data = GmapClient().run_query('query_physical_servers', server_q)
+        else:
+            status, data = GmapClient().run_query('query_physical_servers_by_ip', server_q)
 
         if status > 399:
             return data, status
 
         context = {
-            'server_name': server_name,
+            'server_q': server_q,
+            'search_type': search_type,
             'server_list': [],
             'step': 1
         }

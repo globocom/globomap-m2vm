@@ -6,8 +6,13 @@
 <h2>Lista de VMs em uma máquina física</h2>
 <form action="{{ url_for('server_list') }}" method="post">
   <div class="ss-form-row">
-    <label class="ss-label" for="machine">Maquina física</label>
-    <input class="ss-input-text" type="text" name="server_name" value="{% if server_name %}{{ server_name }}{% endif %}">
+    <input type="radio" name="search_type" id="by_name" value="by_name"
+      {% if search_type == 'by_name' or not search_type %}checked{% endif %}>
+    <label for="by_name">Por Nome</label>
+    <input type="radio" name="search_type" id="by_ip" value="by_ip"
+      {% if search_type == 'by_ip' %}checked{% endif %}>
+    <label for="by_ip">Por IP</label>
+    <input class="ss-input-text" type="text" name="server_q" value="{% if server_q %}{{ server_q }}{% endif %}">
     <button class="ss-btn" type="submit">Procurar</button>
   </div>
 </form>
@@ -15,7 +20,11 @@
 
 {% if step == 1 %}
   {% if server_list %}
-  <p>Máquinas com nome semelhante a "<strong>{{ server_name }}</strong>":</p>
+  <p>
+    Máquinas com
+    {% if search_type == 'by_name' %}nome{% else %}IP{% endif %}
+    semelhante a "<strong>{{ server_q }}</strong>":
+  </p>
   <table class="ss-table server-list">
     <tr>
       <th>Nome</th>
@@ -29,7 +38,11 @@
     {% endfor %}
   </table>
   {% else %}
-  <p>Nenhuma Máquina encontrada para o termo <strong>{{ server_name }}</strong></p>
+  <p>
+    Nenhuma máquina com o
+    {% if search_type == 'by_name' %}nome{% else %}IP{% endif %}
+    <strong>{{ server_q }}</strong> foi encontrada.
+  </p>
   {% endif %}
 {% endif %}
 
