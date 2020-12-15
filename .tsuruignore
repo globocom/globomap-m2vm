@@ -4,11 +4,9 @@
 .git
 .gitignore
 .jshintrc
-.travis.yml
 .vscode
 coverage
-node_modules
-src
-TODO
 LICENSE
+Makefile
 README.md
+TODO
