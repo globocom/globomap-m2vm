@@ -4,6 +4,20 @@ from flask import template_rendered, url_for, request
 import re
 
 
+class FakeConfig:
+    def from_pyfile(self, f):
+        self.file = f
+
+
+class FakeFlask:
+    config = FakeConfig()
+
+    def route(self, *args, **kwargs):
+        def wrp(*args):
+            pass
+        return wrp
+
+
 class AppTest(TestCase):
 
     @classmethod
@@ -13,6 +27,12 @@ class AppTest(TestCase):
 
     def test_app_loads_test_config_module(self):
         self.assertEqual(self.app.config['ENV'], 'testing')
+
+    @mock.patch('m2vm.app.Flask')
+    def test_create_app_with_default_dev_config_module(self, mock_app_flask):
+        mock_app_flask.return_value = FakeFlask()
+        app = create_app()
+        self.assertEqual(app.config.file, 'config/dev_config.py')
 
     def test_app_loads_default_dev_config_if_none_was_passed(self):
         api_env = self.app.config['ENV']
@@ -29,10 +49,9 @@ class AppTest(TestCase):
         self.assertIn('form', body, 'Failed to render the search form')
 
     def test_post_for_home_route_returns_a_bad_request_without_server_name_parameter(self):
-        response = self.client.post('/', data={'server_name': None})
+        response = self.client.post('/', data={'server_q': None})
         self.assertEqual(response.status_code, 400)
 
-    # updated
     @mock.patch('m2vm.client.GmapClient.run_query')
     def test_search_for_server_name_should_render_a_list(self, mock_query):
 
@@ -42,11 +61,10 @@ class AppTest(TestCase):
             'properties': {'ips': ('10.0.0.1', '10.0.0.2')},
         } for x in range(3)]
 
-        response = self.client.post('/', data={'server_name': "m"})
+        response = self.client.post('/', data={'server_q': "m"})
         body = response.data.decode()
         self.assertIn('table', body)
 
-    # updated
     @mock.patch('m2vm.client.GmapClient.run_query')
     def test_server_name_input_text_has_its_value_filled_after_a_search(self, mock_query):
 
@@ -56,19 +74,17 @@ class AppTest(TestCase):
             'properties': {'ips': ('10.0.0.1', '10.0.0.2')},
         } for x in range(3)]
 
-        response = self.client.post('/', data={"server_name": "m"})
+        response = self.client.post('/', data={"server_q": "m"})
         body = response.data.decode()
         match = re.search('value="', body)
         _, value = match.span()
         self.assertNotEqual(value, '"')
 
-    # updated
     def test_returns_bad_request_validation_error_with_a_long_input_query(self):
         string = 'a' * 110
-        response = self.client.post('/', data={'server_name': string})
+        response = self.client.post('/', data={'server_q': string})
         self.assertEqual(response.status_code, 400)
 
-    # new
     @mock.patch('m2vm.client.GmapClient.run_query')
     @mock.patch('m2vm.client.GmapClient.find_vms')
     def test_return_redirect_if_only_one_server_is_found(self, mock_vms, mock_query):
@@ -80,25 +96,22 @@ class AppTest(TestCase):
         mock_vms.return_value = 200, {'nodes': []}
 
         with self.client as c:
-            response = c.post('/', data={"server_name": "machine"}, follow_redirects=True)
+            response = c.post('/', data={"server_q": "machine"}, follow_redirects=True)
             url_redirect = f"/{mock_query.return_value[1][0].get('name')}"
             assert request.path == url_redirect
 
-    # new
     @mock.patch('m2vm.client.GmapClient.run_query')
     def test_render_template_when_server_name_query_returns_empty(self, mock_query):
         mock_query.return_value = 200, []
 
-        response = self.client.post('/', data={"server_name": "machine"}, follow_redirects=True)
+        response = self.client.post('/', data={"server_q": "machine"}, follow_redirects=True)
         body = response.data.decode()
         self.assertNotIn('table', body)
 
-    # new
     def test_vms_route_with_no_server_id(self):
         response = self.client.get('/machine')
         self.assertEqual(response.status_code, 400)
 
-    # new
     @mock.patch('m2vm.client.GmapClient.find_vms')
     def test_no_vms_returns_no_vms_message(self, mock_query):
         mock_query.return_value = 200, {'nodes': None}
@@ -106,7 +119,6 @@ class AppTest(TestCase):
         body = response.data.decode()
         self.assertNotIn('table', body)
 
-    # new
     @mock.patch('m2vm.client.GmapClient.find_vms')
     def test_check_find_vms_are_rendered(self, mock_query):
         mock_query.return_value = 200, {'nodes': [
@@ -120,7 +132,6 @@ class AppTest(TestCase):
         body = response.data.decode()
         self.assertIn('table', body)
 
-    # new
     @mock.patch('m2vm.client.GmapClient.find_vms')
     def test_check_nodes_that_are_not_vms_are_not_rendered(self, mock_query):
         mock_query.return_value = 200, {'nodes': [
@@ -139,16 +150,20 @@ class AppTest(TestCase):
         body = response.data.decode()
         self.assertNotIn('bad_name', body)
 
-    # new
     @mock.patch('m2vm.client.GmapClient.find_vms')
     def test_find_vms_returns_more_than_399(self, mock_query):
         mock_query.return_value = 400, {'nodes': None}
         response = self.client.get('/machine?server_id=asdas3')
         self.assertEqual(response.status_code, 400)
 
-    # new
     @mock.patch('m2vm.client.GmapClient.run_query')
     def test_run_query_returns_more_than_399(self, mock_query):
         mock_query.return_value = 400, {'nodes': None}
-        response = self.client.post('/', data={'server_name': 'data'})
+        response = self.client.post('/', data={'server_q': 'data'})
         self.assertEqual(response.status_code, 400)
+
+    @mock.patch('m2vm.client.GmapClient.run_query')
+    def test_search_servers_by_ip_calls_the_right_query(self, mock_query):
+        mock_query.return_value = 200, {}
+        _ = self.client.post('/', data={'search_type': 'by_ip', 'server_q': '10.0.0.1'})
+        mock_query.assert_called_with('query_physical_servers_by_ip', '10.0.0.1')

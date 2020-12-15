@@ -6,11 +6,9 @@
 <h2>Lista de VMs em uma máquina física</h2>
 <form action="{{ url_for('server_list') }}" method="post">
   <div class="ss-form-row">
-    <input type="radio" name="search_type" id="by_name" value="by_name"
-      {% if search_type == 'by_name' or not search_type %}checked{% endif %}>
+    <input type="radio" name="search_type" id="by_name" value="by_name" {% if search_type == 'by_name' or not search_type %}checked{% endif %}>
     <label for="by_name">Por Nome</label>
-    <input type="radio" name="search_type" id="by_ip" value="by_ip"
-      {% if search_type == 'by_ip' %}checked{% endif %}>
+    <input type="radio" name="search_type" id="by_ip" value="by_ip" {% if search_type == 'by_ip' %}checked{% endif %}>
     <label for="by_ip">Por IP</label>
     <input class="ss-input-text" type="text" name="server_q" value="{% if server_q %}{{ server_q }}{% endif %}">
     <button class="ss-btn" type="submit">Procurar</button>
