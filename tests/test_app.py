@@ -1,7 +1,7 @@
-from unittest import TestCase, mock
-from m2vm.app import create_app
-from flask import template_rendered, url_for, request
 import re
+from unittest import TestCase, mock
+from flask import template_rendered, url_for, request
+from m2vm.app import create_app
 
 
 class FakeConfig:

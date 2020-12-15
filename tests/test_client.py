@@ -1,13 +1,9 @@
 from datetime import datetime, timedelta
 from unittest import TestCase, mock
-from flask import session
+from flask import session, current_app
 from requests.exceptions import HTTPError
 from m2vm.app import create_app
 from m2vm.client import GmapClient
-from m2vm.app import create_app
-from datetime import datetime, timedelta
-from flask import session, current_app
-import requests
 
 
 class ClientTest(TestCase):
