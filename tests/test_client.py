@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from unittest import TestCase, mock
 from flask import session, current_app
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, ConnectionError
 from m2vm.app import create_app
 from m2vm.client import GmapClient
 
@@ -44,7 +44,7 @@ class ClientTest(TestCase):
 
     @mock.patch('requests.post')
     def test_auth_throws_exception(self, mock_post):
-        mock_post.side_effect = requests.exceptions.ConnectionError()
+        mock_post.side_effect = ConnectionError()
         with self.app.test_request_context():
             gmap_client = GmapClient()
             self.assertEqual(gmap_client.token_data, None)
