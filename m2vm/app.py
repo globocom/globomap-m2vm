@@ -56,9 +56,6 @@ def create_app(config_module=None):
                     'vm_list_url': vm_list_url
                 })
 
-        if len(context['server_list']) == 1:
-            return redirect(context['server_list'][0]['vm_list_url'])
-
         return render_template('search.html', **context)
 
     @app.route('/<string:server_name>', methods=['GET'])

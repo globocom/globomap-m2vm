@@ -18,23 +18,33 @@
 
 {% if step == 1 %}
   {% if server_list %}
-  <p>
-    Máquinas com
-    {% if search_type == 'by_name' %}nome{% else %}IP{% endif %}
-    semelhante a "<strong>{{ server_q }}</strong>":
-  </p>
-  <table class="ss-table server-list">
-    <tr>
-      <th>Nome</th>
-      <th>IPs</th>
-    </tr>
-    {% for server in server_list %}
-    <tr>
-      <td><a href="{{ server.vm_list_url }}">{{ server.name }}</a></td>
-      <td>{{ server.ips|join(', ') }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+
+    {% if server_list|length == 1 %}
+
+    <script>location.href = '{{ server_list.0.vm_list_url }}'</script>
+
+    {% else %}
+
+    <p>
+      Máquinas com
+      {% if search_type == 'by_name' %}nome{% else %}IP{% endif %}
+      semelhante a "<strong>{{ server_q }}</strong>":
+    </p>
+    <table class="ss-table server-list">
+      <tr>
+        <th>Nome</th>
+        <th>IPs</th>
+      </tr>
+      {% for server in server_list %}
+      <tr>
+        <td><a href="{{ server.vm_list_url }}">{{ server.name }}</a></td>
+        <td>{{ server.ips|join(', ') }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    {% endif %}
+
   {% else %}
   <p>
     Nenhuma máquina com o
