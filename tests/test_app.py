@@ -96,27 +96,29 @@ class AppTest(TestCase):
         mock_vms.return_value = 200, {'nodes': []}
 
         with self.client as c:
-            response = c.post('/', data={"server_q": "machine"}, follow_redirects=True)
+            response = c.post('/', data={"server_q": "machine"})
             self.assertIn('location.href', response.data.decode())
+
+    @mock.patch('m2vm.client.GmapClient.find_vms')
+    def test_find_vms_with_an_empty_data(self, mock_vms):
+        mock_vms.return_value = 200, {'nodes': []}
+        response = self.client.get('/machine?server_id=asd87a')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('<table', response.data.decode())
 
     @mock.patch('m2vm.client.GmapClient.run_query')
     def test_render_template_when_server_name_query_returns_empty(self, mock_query):
         mock_query.return_value = 200, []
 
-        response = self.client.post('/', data={"server_q": "machine"}, follow_redirects=True)
+        response = self.client.post('/', data={"server_q": "machine"})
         body = response.data.decode()
-        self.assertNotIn('table', body)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('<table', body)
 
     def test_vms_route_with_no_server_id(self):
         response = self.client.get('/machine')
         self.assertEqual(response.status_code, 400)
-
-    @mock.patch('m2vm.client.GmapClient.find_vms')
-    def test_no_vms_returns_no_vms_message(self, mock_query):
-        mock_query.return_value = 200, {'nodes': None}
-        response = self.client.get('/machine')
-        body = response.data.decode()
-        self.assertNotIn('table', body)
 
     @mock.patch('m2vm.client.GmapClient.find_vms')
     def test_check_find_vms_are_rendered(self, mock_query):
