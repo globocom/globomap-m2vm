@@ -97,8 +97,7 @@ class AppTest(TestCase):
 
         with self.client as c:
             response = c.post('/', data={"server_q": "machine"}, follow_redirects=True)
-            url_redirect = f"/{mock_query.return_value[1][0].get('name')}"
-            assert request.path == url_redirect
+            self.assertIn('location.href', response.data.decode())
 
     @mock.patch('m2vm.client.GmapClient.run_query')
     def test_render_template_when_server_name_query_returns_empty(self, mock_query):
